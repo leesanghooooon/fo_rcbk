@@ -18,18 +18,6 @@ export const useAuthStore = defineStore({
     returnUrl: null
   }),
   actions: {
-    getUserInfo(){
-      try {
-        const uData = localStorage.getItem('user')
-        if(uData !== undefined){
-          return JSON.parse(<string>uData)
-        }else{
-          return null;
-        }
-      } catch (error) {
-        return null;
-      }
-    },
     async login(username: string, password: string) {
 
       let param = {
@@ -61,12 +49,31 @@ export const useAuthStore = defineStore({
       // store user details and jwt in local storage to keep user logged in between page refreshes
       localStorage.setItem('user', JSON.stringify(res_user));
       // redirect to previous url or default to home page
-      router.push(this.returnUrl || '/dashboard');
+      await router.push(this.returnUrl || '/dashboard');
     },
     logout() {
       this.user = null;
       localStorage.removeItem('user');
       router.push('/auth/login');
+    },
+    async singUp(param : any){
+      console.log(param)
+
+      await fetchWrapper
+          .post(`/api/rcbk/user/singUp`, param)
+          .then((res) => {
+            console.log(res);
+            if(!res.error.isError){
+              const b = alert(res.error.message)
+            }else{
+              alert(res.error.message)
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            alert(err.error.message)
+          })
+
     }
   }
 });

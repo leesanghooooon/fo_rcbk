@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 // icons
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons-vue';
 const show1 = ref(false);
 const password = ref('');
 const email = ref('');
 const Regform = ref();
-const firstname = ref('');
-const lastname = ref('');
+const username = ref('');
+const hp = ref('');
+let gender = ref('');
+const userid = ref('');
+
 const passwordRules = ref([
   (v: string) => !!v || 'Password is required',
   (v: string) => (v && v.length <= 10) || 'Password must be less than 10 characters'
@@ -17,8 +21,37 @@ const lastRules = ref([(v: string) => !!v || 'Last Name is required']);
 const emailRules = ref([(v: string) => !!v || 'E-mail is required', (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid']);
 
 function validate() {
-  Regform.value.validate();
+
+  const x = alert("dsdas")
+  console.log(x)
+
+  // const validate = Regform.value.validate();
+  const validate = false;
+  // Call SingUp API
+  if(validate){
+    const authStore = useAuthStore();
+    const reqParam = {
+      userid: userid.value
+      , userpw : password.value
+      , username : username.value
+      , hp : hp.value
+      , email : email.value
+      , gender : gender.value
+      , zipcode : ""
+      , address1 : ""
+      , address2 : ""
+      , address3 : ""
+    }
+    return authStore.singUp(reqParam)
+  }
 }
+
+// const authList = ref([
+//   { name: 'Male', value: 'MAIE'},
+//   { name: 'Female', value: 'FEMALE'}
+// ]);
+let genderItems = ref(['MAIE', 'FEMALE']);
+
 </script>
 
 <template>
@@ -30,10 +63,9 @@ function validate() {
     <v-row class="my-0">
       <v-col cols="12" sm="6" class="py-0">
         <div class="mb-6">
-          <v-label>First Name*</v-label>
+          <v-label>Account*</v-label>
           <v-text-field
-            v-model="firstname"
-            :rules="firstRules"
+            v-model="userid"
             hide-details="auto"
             required
             variant="outlined"
@@ -45,10 +77,9 @@ function validate() {
       </v-col>
       <v-col cols="12" sm="6" class="py-0">
         <div class="mb-6">
-          <v-label>Last Name*</v-label>
+          <v-label>Name*</v-label>
           <v-text-field
-            v-model="lastname"
-            :rules="lastRules"
+            v-model="username"
             hide-details="auto"
             required
             variant="outlined"
@@ -59,10 +90,24 @@ function validate() {
         </div>
       </v-col>
     </v-row>
-    <div class="mb-6">
-      <v-label>Company</v-label>
-      <v-text-field hide-details="auto" variant="outlined" class="mt-2" color="primary" placeholder="Demo Inc."></v-text-field>
-    </div>
+    <v-row class="my-0">
+      <v-col cols="12" sm="8" class="py-0">
+        <div class="mb-8">
+          <v-label>Phone Number*</v-label>
+          <v-text-field v-model="hp" hide-details="auto" variant="outlined" class="mt-2" color="primary" placeholder="Demo Inc."></v-text-field>
+        </div>
+      </v-col>
+      <v-col cols="12" sm="4" class="py-0">
+        <div class="mb-4">
+          <v-label>Gender*</v-label>
+          <v-select
+              class="mt-2"
+              color="primary"
+              v-model="gender"
+              :items="genderItems"></v-select>
+        </div>
+      </v-col>
+    </v-row>
     <div class="mb-6">
       <v-label>Email Address*</v-label>
       <v-text-field
@@ -77,7 +122,7 @@ function validate() {
       ></v-text-field>
     </div>
     <div class="mb-6">
-      <v-label>Password</v-label>
+      <v-label>Password*</v-label>
       <v-text-field
         v-model="password"
         :rules="passwordRules"
